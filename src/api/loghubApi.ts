@@ -42,11 +42,6 @@ export const loghubApi = {
     const response = await apiClient.get<PageResponse<LogEvent>>('', { params });
     return response.data;
   },
-
-  async getLogById(id: string): Promise<LogEvent> {
-    const response = await apiClient.get<LogEvent>(`/${id}`);
-    return response.data;
-  },
 };
 
 export default apiClient;
