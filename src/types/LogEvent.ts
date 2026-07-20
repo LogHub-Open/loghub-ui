@@ -1,7 +1,7 @@
 export type LogLevel = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
 export interface LogEvent {
-  id?: string;
+  id?: number;
   application: string;
   environment: string;
   level: LogLevel;
