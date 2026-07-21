@@ -4,8 +4,8 @@
 # Dispara automaticamente a cada push na branch main.
 # A imagem é publicada em: ghcr.io/loghub-open/loghub-ui:latest
 #
-# Requer os secrets do repositório VITE_LOGHUB_API_URL e VITE_LOGHUB_API_KEY
-# (Vite embute env vars no build, não em runtime — ver README/CLAUDE.md).
+# LOGHUB_API_URL/LOGHUB_API_KEY são runtime env vars (ver public/env-config.js
+# e docker-entrypoint.d/), não build-args — a mesma imagem serve qualquer deploy.
 # =============================================================================
 
 name: Build e Publish — loghub-ui
@@ -63,8 +63,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VITE_LOGHUB_API_URL=${{ secrets.VITE_LOGHUB_API_URL }}
-            VITE_LOGHUB_API_KEY=${{ secrets.VITE_LOGHUB_API_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
