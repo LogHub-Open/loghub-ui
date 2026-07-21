@@ -1,11 +1,25 @@
 import axios from 'axios';
 import type { LogEvent, LogFilters, PageResponse } from '../types/LogEvent';
 
+declare global {
+  interface Window {
+    __ENV__?: {
+      LOGHUB_API_URL?: string;
+      LOGHUB_API_KEY?: string;
+    };
+  }
+}
+
+// window.__ENV__ é populado em runtime pelo container Docker (ver public/env-config.js);
+// import.meta.env é o fallback pro dev local (npm run dev), sem Docker.
+const apiUrl = window.__ENV__?.LOGHUB_API_URL || import.meta.env.VITE_LOGHUB_API_URL;
+const apiKey = window.__ENV__?.LOGHUB_API_KEY || import.meta.env.VITE_LOGHUB_API_KEY;
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_LOGHUB_API_URL || 'http://localhost:8080/api/logs',
+  baseURL: apiUrl || 'http://localhost:8080/api/logs',
   headers: {
     'Content-Type': 'application/json',
-    'X-API-KEY': import.meta.env.VITE_LOGHUB_API_KEY || '',
+    'X-API-KEY': apiKey || '',
   },
 });
 
