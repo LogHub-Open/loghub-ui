@@ -1,0 +1,90 @@
+:root {
+  /* ===== Neutral scale — cool, slightly blue-tinted (dark-mode-first) ===== */
+  --neutral-0: oklch(99% 0.002 260);
+  --neutral-50: oklch(96% 0.004 260);
+  --neutral-100: oklch(92% 0.006 262);
+  --neutral-200: oklch(85% 0.008 262);
+  --neutral-300: oklch(74% 0.01 264);
+  --neutral-400: oklch(62% 0.012 264);
+  --neutral-500: oklch(52% 0.014 266);
+  --neutral-600: oklch(42% 0.016 266);
+  --neutral-700: oklch(33% 0.018 266);
+  --neutral-800: oklch(24% 0.018 266);
+  --neutral-850: oklch(19% 0.02 266);
+  --neutral-900: oklch(15% 0.02 266);
+  --neutral-950: oklch(11% 0.018 266);
+
+  /* ===== Primary — indigo → violet brand gradient ===== */
+  --primary-50: oklch(95% 0.02 273);
+  --primary-100: oklch(90% 0.05 273);
+  --primary-200: oklch(83% 0.09 275);
+  --primary-300: oklch(74% 0.13 277);
+  --primary-400: oklch(66% 0.18 279);
+  --primary-500: #6366F1; /* brand indigo */
+  --primary-600: #7C3AED; /* brand violet */
+  --primary-700: oklch(46% 0.20 297);
+  --primary-800: oklch(38% 0.17 297);
+  --primary-900: oklch(30% 0.13 296);
+  --primary-gradient: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+
+  /* ===== Log level semantics ===== */
+  --log-error: oklch(60% 0.21 23);
+  --log-error-bg: oklch(60% 0.21 23 / 0.14);
+  --log-warn: oklch(78% 0.16 88);
+  --log-warn-bg: oklch(78% 0.16 88 / 0.16);
+  --log-info: oklch(68% 0.13 224);
+  --log-info-bg: oklch(68% 0.13 224 / 0.14);
+  --log-debug: oklch(64% 0.18 300);
+  --log-debug-bg: oklch(64% 0.18 300 / 0.14);
+  --log-trace: oklch(62% 0.014 266);
+  --log-trace-bg: oklch(62% 0.014 266 / 0.14);
+
+  /* ===== UI state colors ===== */
+  --state-success: oklch(64% 0.15 152);
+  --state-success-bg: oklch(64% 0.15 152 / 0.14);
+  --state-danger: var(--log-error);
+  --state-danger-bg: var(--log-error-bg);
+  --state-warning: var(--log-warn);
+  --state-warning-bg: var(--log-warn-bg);
+  --state-info: var(--log-info);
+  --state-info-bg: var(--log-info-bg);
+
+  /* ===== Semantic aliases — dark theme is default ===== */
+  --bg-canvas: var(--neutral-950);
+  --bg-surface: var(--neutral-900);
+  --bg-surface-raised: var(--neutral-850);
+  --bg-surface-hover: var(--neutral-800);
+  --bg-overlay: oklch(11% 0.018 266 / 0.72);
+
+  --border-subtle: var(--neutral-800);
+  --border-default: var(--neutral-700);
+  --border-strong: var(--neutral-600);
+
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-300);
+  --text-tertiary: var(--neutral-500);
+  --text-on-primary: #FFFFFF;
+  --text-link: var(--primary-300);
+  --text-link-hover: var(--primary-200);
+
+  --focus-ring: var(--primary-400);
+}
+
+/* Light theme — opt-in via [data-theme="light"] on a container */
+[data-theme="light"] {
+  --bg-canvas: var(--neutral-0);
+  --bg-surface: #FFFFFF;
+  --bg-surface-raised: var(--neutral-50);
+  --bg-surface-hover: var(--neutral-100);
+  --bg-overlay: oklch(15% 0.02 266 / 0.4);
+
+  --border-subtle: var(--neutral-200);
+  --border-default: var(--neutral-200);
+  --border-strong: var(--neutral-300);
+
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-tertiary: var(--neutral-400);
+  --text-link: var(--primary-600);
+  --text-link-hover: var(--primary-700);
+}

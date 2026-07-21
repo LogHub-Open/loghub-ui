@@ -1,17 +1,10 @@
-import type { LogEvent, LogLevel } from '../types/LogEvent';
+import type { LogEvent } from '../types/LogEvent';
+import { LogLevelBadge } from './data/LogLevelBadge';
 
 interface LogDetailsProps {
   log: LogEvent;
   onClose: () => void;
 }
-
-const levelColors: Record<LogLevel, string> = {
-  TRACE: 'bg-gray-100 text-gray-800 border-gray-300',
-  DEBUG: 'bg-gray-200 text-gray-800 border-gray-400',
-  INFO: 'bg-blue-100 text-blue-800 border-blue-300',
-  WARN: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  ERROR: 'bg-red-100 text-red-800 border-red-300',
-};
 
 function formatTimestamp(timestamp: string): string {
   try {
@@ -38,104 +31,98 @@ function formatJson(obj: unknown): string {
   }
 }
 
+const fieldLabelStyle = {
+  display: 'block',
+  marginBottom: 'var(--space-1)',
+  color: 'var(--text-tertiary)',
+  font: 'var(--text-label)',
+  fontFamily: 'var(--font-sans)',
+  letterSpacing: 'var(--tracking-label)',
+  textTransform: 'uppercase' as const,
+};
+
 export function LogDetails({ log, onClose }: LogDetailsProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Detalhes do Log</h2>
+    <div style={{ position: 'fixed', inset: 0, background: 'var(--bg-overlay)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4)', zIndex: 50 }}>
+      <div style={{
+        background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-3)', maxWidth: 720, width: '100%', maxHeight: '90vh', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div style={{ padding: 'var(--space-4) var(--space-6)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ color: 'var(--text-primary)', font: 'var(--text-h3)', fontFamily: 'var(--font-sans)' }}>Detalhes do Log</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Fechar"
+            style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', display: 'flex' }}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {/* Level Badge */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${levelColors[log.level]}`}
-            >
-              {log.level}
-            </span>
-            <span className="text-gray-500 text-sm">{formatTimestamp(log.timestamp)}</span>
+        <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <LogLevelBadge level={log.level} />
+            <span style={{ color: 'var(--text-tertiary)', font: 'var(--text-caption)' }}>{formatTimestamp(log.timestamp)}</span>
           </div>
 
-          {/* Application & Environment */}
-          <div className="grid grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                Application
-              </label>
-              <p className="text-gray-900 font-medium">{log.application}</p>
+              <label style={fieldLabelStyle}>Application</label>
+              <p style={{ color: 'var(--text-primary)', font: 'var(--text-body-medium)' }}>{log.application}</p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                Environment
-              </label>
-              <p className="text-gray-900">{log.environment}</p>
+              <label style={fieldLabelStyle}>Environment</label>
+              <p style={{ color: 'var(--text-secondary)', font: 'var(--text-body)' }}>{log.environment}</p>
             </div>
           </div>
 
-          {/* Trace ID */}
           {log.traceId && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                Trace ID
-              </label>
-              <code className="block bg-gray-100 px-3 py-2 rounded text-sm font-mono text-gray-800 break-all">
+              <label style={fieldLabelStyle}>Trace ID</label>
+              <code style={{ display: 'block', background: 'var(--bg-surface-raised)', border: '1px solid var(--border-subtle)', padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-sm)', font: 'var(--text-code-sm)', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', wordBreak: 'break-all' }}>
                 {log.traceId}
               </code>
             </div>
           )}
 
-          {/* Message */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-              Mensagem
-            </label>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-gray-900 whitespace-pre-wrap break-words">{log.message}</p>
+            <label style={fieldLabelStyle}>Mensagem</label>
+            <div style={{ background: 'var(--bg-surface-raised)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: 'var(--space-4)' }}>
+              <p style={{ color: 'var(--text-primary)', font: 'var(--text-body)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{log.message}</p>
             </div>
           </div>
 
-          {/* SDK Info */}
           {log.sdk && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                SDK
-              </label>
-              <p className="text-gray-700">
-                {log.sdk.language} v{log.sdk.version}
-              </p>
+              <label style={fieldLabelStyle}>SDK</label>
+              <p style={{ color: 'var(--text-secondary)', font: 'var(--text-body)' }}>{log.sdk.language} v{log.sdk.version}</p>
             </div>
           )}
 
-          {/* Metadata */}
           {log.metadata && Object.keys(log.metadata).length > 0 && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                Metadata
-              </label>
-              <pre className="bg-gray-900 text-green-400 p-4 rounded-lg text-sm overflow-x-auto font-mono">
+              <label style={fieldLabelStyle}>Metadata</label>
+              <pre style={{ background: 'var(--neutral-950)', color: 'var(--log-info)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', overflowX: 'auto', font: 'var(--text-code-sm)', fontFamily: 'var(--font-mono)' }}>
                 {formatJson(log.metadata)}
               </pre>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div style={{ padding: 'var(--space-4) var(--space-6)', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface-raised)' }}>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            style={{
+              padding: '9px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)', color: 'var(--text-primary)', font: 'var(--text-body-medium)',
+              fontFamily: 'var(--font-sans)', fontWeight: 600, cursor: 'pointer',
+              transition: 'filter var(--duration-fast) var(--ease-standard)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.filter = 'brightness(1.15)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.filter = 'none'; }}
           >
             Fechar
           </button>

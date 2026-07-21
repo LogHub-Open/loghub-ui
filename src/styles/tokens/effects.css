@@ -1,0 +1,18 @@
+:root {
+  /* Geometric, mostly-sharp radii — logo mark has none at all */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-full: 999px;
+
+  --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.24);
+  --shadow-2: 0 4px 12px oklch(0% 0 0 / 0.32);
+  --shadow-3: 0 12px 32px oklch(0% 0 0 / 0.4);
+  --shadow-focus: 0 0 0 3px oklch(66% 0.18 279 / 0.35);
+
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+}

@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import type { LogFilters, LogLevel } from '../types/LogEvent';
+import { Input } from './ui/Input';
+import { Select } from './ui/Select';
+import { Button } from './ui/Button';
 
 interface LogFiltersProps {
   onFilter: (filters: LogFilters) => void;
@@ -8,129 +11,109 @@ interface LogFiltersProps {
 
 const LOG_LEVELS: LogLevel[] = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'];
 
+const EMPTY_FILTERS: LogFilters = {
+  application: '',
+  environment: '',
+  level: '',
+  from: '',
+  to: '',
+};
+
+const labelStyle = {
+  display: 'block',
+  marginBottom: 'var(--space-1)',
+  color: 'var(--text-secondary)',
+  font: 'var(--text-caption)',
+  fontFamily: 'var(--font-sans)',
+};
+
 export function LogFiltersComponent({ onFilter, isLoading }: LogFiltersProps) {
-  const [filters, setFilters] = useState<LogFilters>({
-    application: '',
-    environment: '',
-    level: '',
-    from: '',
-    to: '',
-  });
+  const [filters, setFilters] = useState<LogFilters>(EMPTY_FILTERS);
 
   const handleChange = (field: keyof LogFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onFilter(filters);
   };
 
   const handleClear = () => {
-    const clearedFilters: LogFilters = {
-      application: '',
-      environment: '',
-      level: '',
-      from: '',
-      to: '',
-    };
-    setFilters(clearedFilters);
-    onFilter(clearedFilters);
+    setFilters(EMPTY_FILTERS);
+    onFilter(EMPTY_FILTERS);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg shadow mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)',
+        padding: 'var(--space-4)', marginBottom: 'var(--space-6)',
+      }}
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)' }}>
         <div>
-          <label htmlFor="application" className="block text-sm font-medium text-gray-700 mb-1">
-            Application
-          </label>
-          <input
-            type="text"
+          <label htmlFor="application" style={labelStyle}>Application</label>
+          <Input
             id="application"
             value={filters.application}
             onChange={(e) => handleChange('application', e.target.value)}
             placeholder="Nome da aplicação"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="environment" className="block text-sm font-medium text-gray-700 mb-1">
-            Environment
-          </label>
-          <input
-            type="text"
+          <label htmlFor="environment" style={labelStyle}>Environment</label>
+          <Input
             id="environment"
             value={filters.environment}
             onChange={(e) => handleChange('environment', e.target.value)}
             placeholder="Ex: production, staging"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <div>
-          <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
-            Level
-          </label>
-          <select
+          <label htmlFor="level" style={labelStyle}>Level</label>
+          <Select
             id="level"
             value={filters.level}
             onChange={(e) => handleChange('level', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todos os níveis</option>
-            {LOG_LEVELS.map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="from" className="block text-sm font-medium text-gray-700 mb-1">
-            De
-          </label>
-          <input
-            type="datetime-local"
-            id="from"
-            value={filters.from}
-            onChange={(e) => handleChange('from', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            options={[
+              { value: '', label: 'Todos os níveis' },
+              ...LOG_LEVELS.map((level) => ({ value: level, label: level })),
+            ]}
           />
         </div>
 
         <div>
-          <label htmlFor="to" className="block text-sm font-medium text-gray-700 mb-1">
-            Até
-          </label>
-          <input
+          <label htmlFor="from" style={labelStyle}>De</label>
+          <Input
+            id="from"
             type="datetime-local"
+            value={filters.from}
+            onChange={(e) => handleChange('from', e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="to" style={labelStyle}>Até</label>
+          <Input
             id="to"
+            type="datetime-local"
             value={filters.to}
             onChange={(e) => handleChange('to', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+      <div style={{ marginTop: 'var(--space-4)', display: 'flex', gap: 'var(--space-2)' }}>
+        <Button type="submit" disabled={isLoading}>
           {isLoading ? 'Buscando...' : 'Buscar'}
-        </button>
-        <button
-          type="button"
-          onClick={handleClear}
-          disabled={isLoading}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        </Button>
+        <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
           Limpar
-        </button>
+        </Button>
       </div>
     </form>
   );
