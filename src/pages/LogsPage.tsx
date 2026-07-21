@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { LogFiltersComponent } from '../components/LogFilters';
 import { LogTable } from '../components/LogTable';
 import { LogDetails } from '../components/LogDetails';
@@ -20,12 +20,17 @@ export function LogsPage() {
     totalPages: 0,
   });
 
+  const latestRequestId = useRef(0);
+
   const fetchLogs = useCallback(async (filters?: LogFilters, page = 0) => {
+    const requestId = ++latestRequestId.current;
     setIsLoading(true);
     setError(null);
 
     try {
       const response = await loghubApi.getLogs(filters, page, PAGE_SIZE);
+      if (requestId !== latestRequestId.current) return; // stale response, a newer request is in flight
+
       setLogs(response.content);
       setPagination({
         page: response.page,
@@ -34,11 +39,15 @@ export function LogsPage() {
         totalPages: response.totalPages,
       });
     } catch (err) {
+      if (requestId !== latestRequestId.current) return;
+
       console.error('Erro ao buscar logs:', err);
       setError('Erro ao carregar logs. Verifique sua conexão e tente novamente.');
       setLogs([]);
     } finally {
-      setIsLoading(false);
+      if (requestId === latestRequestId.current) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
