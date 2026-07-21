@@ -3,6 +3,7 @@ import { LogFiltersComponent } from '../components/LogFilters';
 import { LogTable } from '../components/LogTable';
 import { LogDetails } from '../components/LogDetails';
 import { loghubApi } from '../api/loghubApi';
+import logoMark from '../assets/logo-mark.svg';
 import type { LogEvent, LogFilters, PageResponse } from '../types/LogEvent';
 
 const PAGE_SIZE = 20;
@@ -73,106 +74,53 @@ export function LogsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div style={{ minHeight: '100vh', background: 'var(--bg-canvas)' }}>
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-600 rounded-lg p-2">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">LogHub</h1>
-              <p className="text-sm text-gray-500">Visualização e diagnóstico de logs</p>
-            </div>
+      <header style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: 'var(--space-4) var(--space-6)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <img src={logoMark} alt="LogHub" style={{ width: 36, height: 36 }} />
+          <div>
+            <h1 style={{ color: 'var(--text-primary)', font: 'var(--text-h2)', fontFamily: 'var(--font-sans)' }}>LogHub</h1>
+            <p style={{ color: 'var(--text-tertiary)', font: 'var(--text-caption)', fontFamily: 'var(--font-sans)' }}>Visualização e diagnóstico de logs</p>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+      <main style={{ maxWidth: 1280, margin: '0 auto', padding: 'var(--space-6)' }}>
         {/* Filters */}
         <LogFiltersComponent onFilter={handleFilter} isLoading={isLoading} />
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <span>{error}</span>
-            </div>
+          <div style={{
+            marginBottom: 'var(--space-6)', background: 'var(--state-danger-bg)', border: '1px solid var(--state-danger)',
+            color: 'var(--state-danger)', padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-md)',
+            display: 'flex', alignItems: 'center', gap: 'var(--space-2)', font: 'var(--text-body)',
+          }}>
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
         {/* Results count */}
         {!isLoading && !error && (
-          <div className="mb-4 text-sm text-gray-600">
+          <div style={{ marginBottom: 'var(--space-4)', color: 'var(--text-secondary)', font: 'var(--text-body)', fontFamily: 'var(--font-sans)' }}>
             {pagination.totalElements} {pagination.totalElements === 1 ? 'log encontrado' : 'logs encontrados'}
-            {pagination.totalPages > 1 && (
-              <span className="ml-2">
-                (Página {pagination.page + 1} de {pagination.totalPages})
-              </span>
-            )}
           </div>
         )}
 
         {/* Logs Table */}
-        <LogTable logs={logs} onSelectLog={handleSelectLog} isLoading={isLoading} />
-
-        {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <button
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={pagination.page === 0 || isLoading}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Anterior
-            </button>
-            
-            <div className="flex gap-1">
-              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                let pageNum: number;
-                if (pagination.totalPages <= 5) {
-                  pageNum = i;
-                } else if (pagination.page < 3) {
-                  pageNum = i;
-                } else if (pagination.page > pagination.totalPages - 4) {
-                  pageNum = pagination.totalPages - 5 + i;
-                } else {
-                  pageNum = pagination.page - 2 + i;
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    disabled={isLoading}
-                    className={`px-3 py-2 border rounded-md text-sm font-medium ${
-                      pagination.page === pageNum
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    } disabled:opacity-50`}
-                  >
-                    {pageNum + 1}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={pagination.page >= pagination.totalPages - 1 || isLoading}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Próxima
-            </button>
-          </div>
-        )}
+        <LogTable
+          logs={logs}
+          onSelectLog={handleSelectLog}
+          isLoading={isLoading}
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+        />
       </main>
 
       {/* Log Details Modal */}
