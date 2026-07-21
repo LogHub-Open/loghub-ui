@@ -1,0 +1,70 @@
+# =============================================================================
+# loghub-ui: Build e publicação da imagem Docker no ghcr.io
+#
+# Dispara automaticamente a cada push na branch main.
+# A imagem é publicada em: ghcr.io/loghub-open/loghub-ui:latest
+#
+# Requer os secrets do repositório VITE_LOGHUB_API_URL e VITE_LOGHUB_API_KEY
+# (Vite embute env vars no build, não em runtime — ver README/CLAUDE.md).
+# =============================================================================
+
+name: Build e Publish — loghub-ui
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: loghub-open/loghub-ui
+
+jobs:
+  build-and-push:
+    name: Build e Push da imagem ARM64
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar QEMU (emulação ARM64)
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extrair metadados da imagem
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+
+      - name: Build e Push da imagem
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_LOGHUB_API_URL=${{ secrets.VITE_LOGHUB_API_URL }}
+            VITE_LOGHUB_API_KEY=${{ secrets.VITE_LOGHUB_API_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
