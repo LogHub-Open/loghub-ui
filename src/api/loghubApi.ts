@@ -54,7 +54,7 @@ export const loghubApi = {
     params.append('size', size.toString());
 
     const response = await apiClient.get<PageResponse<LogEvent>>('', { params });
-    return response.data;
+    return { ...response.data, content: response.data.content ?? [] };
   },
 };
 
